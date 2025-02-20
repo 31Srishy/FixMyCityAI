@@ -12,6 +12,8 @@ import java.util.Optional;
 public class ComplaintService {
     @Autowired
     private ComplaintRepository complaintRepository;
+    @Autowired
+    private AzureAIService azureAIService;
 
     public ComplaintEntity lodgeComplaint(ComplaintEntity complaint) {
         String filePath = "src/main/resources/uploads/" + complaint.getImage().getOriginalFilename();
@@ -21,10 +23,20 @@ public class ComplaintService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        // Check for duplicate complaint
+        Optional<ComplaintEntity> existingComplaint = complaintRepository.findAll().stream()
+                .filter(c -> c.getTitle().equalsIgnoreCase(complaint.getTitle()) &&
+                        c.getCategory().equalsIgnoreCase(azureAIService.categorizeComplaint(complaint.getDescription())))
+                .findFirst();
+
+        if (existingComplaint.isPresent()) {
+            throw new DuplicateComplaintException("Similar complaint exists! Please upvote: " + existingComplaint.get().getId());
+        }
         // Send complaint data to Azure AI for categorization & prioritization
-        complaint.setCategory(AzureAIService.categorizeComplaint(complaint.getDescription()));
-        complaint.setPriority(AzureAIService.assignPriority(complaint.getDescription()));
+        complaint.setCategory(azureAIService.categorizeComplaint(complaint.getDescription()));
+        complaint.setPriority(azureAIService.assignPriority(complaint.getDescription()));
         complaint.setStatus("Open");
+        azureTableStorageService.saveComplaint(savedComplaint.getId(), savedComplaint.getTitle(), savedComplaint.getCategory(), savedComplaint.getPriority());
         return complaintRepository.save(complaint);
     }
 

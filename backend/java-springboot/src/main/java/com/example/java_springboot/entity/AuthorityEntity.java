@@ -1,5 +1,7 @@
 package com.example.java_springboot.entity;
 
+import com.azure.spring.data.cosmos.core.mapping.Container;
+import com.azure.spring.data.cosmos.core.mapping.GeneratedValue;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,12 +10,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.UUID;
 
-@Document(collection = "authority")
+@Container(containerName = "authority")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class AuthorityEntity {
-    @Id
+    @GeneratedValue
     private String id = UUID.randomUUID().toString();
     private String name;
     private String email;

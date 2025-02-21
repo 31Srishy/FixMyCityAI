@@ -1,5 +1,6 @@
 package com.example.java_springboot.service;
 
+import com.azure.cosmos.models.PartitionKey;
 import com.example.java_springboot.entity.AuthorityEntity;
 import com.example.java_springboot.repository.AuthorityRepository;
 import com.example.java_springboot.exception.ResourceNotFoundException;
@@ -8,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class AuthorityService {
@@ -17,10 +20,6 @@ public class AuthorityService {
 
     /**
      * Register a new authority.
-     *
-     * @param authority The authority entity to be registered.
-     * @return The registered authority entity.
-     * @throws IllegalArgumentException If the authority is null or has invalid data.
      */
     public AuthorityEntity registerAuthority(AuthorityEntity authority) {
         if (authority == null) {
@@ -37,19 +36,15 @@ public class AuthorityService {
 
     /**
      * Get all authorities.
-     *
-     * @return A list of all authorities.
      */
     public List<AuthorityEntity> getAllAuthorities() {
-        return authorityRepository.findAll();
+        // Convert Iterable to List
+        return StreamSupport.stream(authorityRepository.findAll().spliterator(), false)
+                .collect(Collectors.toList());
     }
 
     /**
-     * Get an authority by its ID.
-     *
-     * @param id The ID of the authority.
-     * @return The authority entity.
-     * @throws ResourceNotFoundException If the authority is not found.
+     * Get an authority by ID.
      */
     public AuthorityEntity getAuthorityById(String id) {
         return authorityRepository.findById(id)
@@ -58,14 +53,10 @@ public class AuthorityService {
 
     /**
      * Update an existing authority.
-     *
-     * @param id             The ID of the authority to update.
-     * @param updatedAuthority The updated authority entity.
-     * @return The updated authority entity.
-     * @throws ResourceNotFoundException If the authority is not found.
      */
     public AuthorityEntity updateAuthority(String id, AuthorityEntity updatedAuthority) {
-        if (!authorityRepository.existsById(id)) {
+        // Check if the authority exists before updating
+        if (!authorityRepository.findById(id).isPresent()) {
             throw new ResourceNotFoundException("Authority not found with ID: " + id);
         }
 
@@ -74,13 +65,11 @@ public class AuthorityService {
     }
 
     /**
-     * Delete an authority by its ID.
-     *
-     * @param id The ID of the authority to delete.
-     * @throws ResourceNotFoundException If the authority is not found.
+     * Delete an authority by ID.
      */
     public void deleteAuthority(String id) {
-        if (!authorityRepository.existsById(id)) {
+        // Check if the authority exists before deleting
+        if (!authorityRepository.findById(id).isPresent()) {
             throw new ResourceNotFoundException("Authority not found with ID: " + id);
         }
 
@@ -88,11 +77,7 @@ public class AuthorityService {
     }
 
     /**
-     * Get an authority by its email.
-     *
-     * @param email The email of the authority.
-     * @return The authority entity.
-     * @throws ResourceNotFoundException If the authority is not found.
+     * Get an authority by email.
      */
     public AuthorityEntity getAuthorityByEmail(String email) {
         return authorityRepository.findByEmail(email)
@@ -100,10 +85,7 @@ public class AuthorityService {
     }
 
     /**
-     * Check if an authority exists with the given email.
-     *
-     * @param email The email to check.
-     * @return True if the email is registered, false otherwise.
+     * Check if an authority exists by email.
      */
     public boolean existsByEmail(String email) {
         return authorityRepository.existsByEmail(email);

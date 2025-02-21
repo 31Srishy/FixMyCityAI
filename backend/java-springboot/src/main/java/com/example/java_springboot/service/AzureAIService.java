@@ -3,12 +3,15 @@ package com.example.java_springboot.service;
 import com.azure.ai.textanalytics.TextAnalyticsClient;
 import com.azure.ai.textanalytics.TextAnalyticsClientBuilder;
 import com.azure.ai.textanalytics.models.DocumentSentiment;
+import com.azure.ai.textanalytics.models.TextSentiment;
 import com.azure.core.credential.AzureKeyCredential;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.azure.ai.textanalytics.models.TextSentiment.*;
 
 @Service
 public class AzureAIService {
@@ -72,18 +75,18 @@ public class AzureAIService {
         try {
             // Analyze sentiment using Azure Text Analytics
             DocumentSentiment sentiment = textAnalyticsClient.analyzeSentiment(description);
+            TextSentiment textSentiment = sentiment.getSentiment(); // Get enum value
 
             // Assign priority based on sentiment
-            switch (sentiment.getSentiment()) {
-                case NEGATIVE:
-                    return "High";
-                case NEUTRAL:
-                    return "Medium";
-                case POSITIVE:
-                    return "Low";
-                default:
-                    return "Medium";
+            // Use enum directly
+            if (textSentiment.equals(NEGATIVE)) {
+                return "High";
+            } else if (textSentiment.equals(NEUTRAL)) {
+                return "Medium";
+            } else if (textSentiment.equals(POSITIVE)) {
+                return "Low";
             }
+            return "Medium";
         } catch (Exception e) {
             // Log the error and return a default priority
             System.err.println("Error analyzing sentiment: " + e.getMessage());

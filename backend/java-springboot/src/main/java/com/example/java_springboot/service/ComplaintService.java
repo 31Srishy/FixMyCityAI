@@ -15,6 +15,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class ComplaintService {
@@ -81,7 +83,7 @@ public class ComplaintService {
      * @return True if a duplicate exists, false otherwise.
      */
     private boolean isDuplicateComplaint(ComplaintEntity complaint) {
-        return complaintRepository.findAll().stream()
+        return StreamSupport.stream(complaintRepository.findAll().spliterator(), false)
                 .anyMatch(c -> c.getTitle().equalsIgnoreCase(complaint.getTitle()) &&
                         c.getCategory().equalsIgnoreCase(complaint.getCategory()));
     }
@@ -92,7 +94,8 @@ public class ComplaintService {
      * @return A list of all complaints.
      */
     public List<ComplaintEntity> getAllComplaints() {
-        return complaintRepository.findAll();
+        return StreamSupport.stream(complaintRepository.findAll().spliterator(), false)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -103,7 +106,7 @@ public class ComplaintService {
      * @throws ResourceNotFoundException If the complaint is not found.
      */
     public ComplaintEntity getComplaintById(UUID id) {
-        return complaintRepository.findById(id)
+        return complaintRepository.findById(id.toString())
                 .orElseThrow(() -> new ResourceNotFoundException("Complaint not found with ID: " + id));
     }
 
@@ -116,10 +119,10 @@ public class ComplaintService {
      * @throws ResourceNotFoundException If the complaint is not found.
      */
     public ComplaintEntity updateComplaint(UUID id, ComplaintEntity updatedComplaint) {
-        if (!complaintRepository.existsById(id)) {
+        if (!complaintRepository.existsById(id.toString())) {
             throw new ResourceNotFoundException("Complaint not found with ID: " + id);
         }
-        updatedComplaint.setId(id);
+        updatedComplaint.setId(id.toString());
         return complaintRepository.save(updatedComplaint);
     }
 
@@ -130,9 +133,9 @@ public class ComplaintService {
      * @throws ResourceNotFoundException If the complaint is not found.
      */
     public void deleteComplaint(UUID id) {
-        if (!complaintRepository.existsById(id)) {
+        if (!complaintRepository.existsById(id.toString())) {
             throw new ResourceNotFoundException("Complaint not found with ID: " + id);
         }
-        complaintRepository.deleteById(id);
+        complaintRepository.deleteById(id.toString());
     }
 }

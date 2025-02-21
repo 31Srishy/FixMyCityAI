@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class UserService {
@@ -41,7 +43,9 @@ public class UserService {
      * @return A list of all users.
      */
     public List<UserEntity> getAllUsers() {
-        return userRepository.findAll();
+        Iterable<UserEntity> iterable = userRepository.findAll();
+        return StreamSupport.stream(iterable.spliterator(), false)
+                .collect(Collectors.toList());
     }
 
     /**

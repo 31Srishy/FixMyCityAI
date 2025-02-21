@@ -1,16 +1,17 @@
-package com.example.java_springboot.Entity;
+package com.example.java_springboot.entity;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
 import java.util.UUID;
 
-@Entity
+@Document(collection = "authority")
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class AuthorityEntity {
     @Id
     private String id = UUID.randomUUID().toString();

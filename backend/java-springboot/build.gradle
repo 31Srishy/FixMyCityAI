@@ -38,7 +38,39 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// Spring Boot Starters
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+
+	// Azure Spring Cloud
+	implementation 'com.azure.spring:spring-cloud-azure-starter'
+	implementation 'com.azure.spring:spring-cloud-azure-starter-storage'
+
+	// MongoDB (Required for @Document annotation)
+	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
+	// Azure Cosmos DB Repository
+	implementation 'com.azure.spring:spring-cloud-azure-starter-data-cosmos'
+
+	// Azure AI Text Analytics
+	implementation 'com.azure:azure-ai-textanalytics:5.2.2'
+
+	// Azure Table Storage SDK
+	implementation 'com.azure:azure-data-tables:12.5.0'
+
+	// Lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	// Microsoft SQL Server JDBC (if required)
+	runtimeOnly 'com.microsoft.sqlserver:mssql-jdbc'
+
+	// Testing
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
+
 
 dependencyManagement {
 	imports {

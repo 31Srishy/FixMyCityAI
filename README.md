@@ -4,6 +4,12 @@
 ## 📌 Overview
 FixMyCity AI is an AI-powered platform that helps citizens report civic issues (like potholes, garbage dumps, and traffic congestion) and enables authorities to resolve them efficiently.
 
+## 📌 Pitch Video
+🎬 Watch our pitch video to see **Civic AI** in action!  
+
+[![Watch the Pitch Video](https://img.shields.io/badge/Watch%20Pitch%20Video-%F0%9F%93%B2-blue?style=for-the-badge)](https://drive.google.com/file/d/13bntu-xTjlf2_83fFGwZk4seJDOw97o8/view?usp=sharing)  
+
+
 ## 📜 How to Run Locally
 1️⃣ Clone the repo:
 ```sh

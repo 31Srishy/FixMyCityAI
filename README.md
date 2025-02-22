@@ -24,3 +24,7 @@ cd frontend
 npm install
 #to run
 npm run dev
+
+
+#Pitch video:
+https://drive.google.com/file/d/13bntu-xTjlf2_83fFGwZk4seJDOw97o8/view?usp=sharing

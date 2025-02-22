@@ -13,10 +13,11 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from django.http import JsonResponse
 import uuid
+import os
 
 
 # Azure Storage Account credentials
-AZURE_CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName=fixmycity;AccountKey=4RNgv9yrTgCooGJfSEQcoGTuRAISpLSZ3BO2J3NsNRt3qRcTRTbjlG/V+e0Kb6HwEy2wSk7iX1Lg+AStQSsfcg==;EndpointSuffix=core.windows.net"
+AZURE_CONNECTION_STRING = os.getenv("AZURE_CONNECTION_STRING")
 CONTAINER_NAME = "complaints-images"
 
 @api_view(['GET'])

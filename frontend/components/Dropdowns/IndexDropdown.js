@@ -83,7 +83,7 @@ const IndexDropdown = () => {
             Tables
           </a>
         </Link>
-        <Link href="/admin/maps" legacyBehavior>
+        {/* <Link href="/admin/maps" legacyBehavior>
           <a
             href="#pablo"
             className={
@@ -92,35 +92,9 @@ const IndexDropdown = () => {
           >
             Maps
           </a>
-        </Link>
-        <div className="h-0 mx-4 my-2 border border-solid border-blueGray-100" />
-        <span
-          className={
-            "text-sm pt-2 pb-0 px-4 font-bold block w-full whitespace-nowrap bg-transparent text-blueGray-400"
-          }
-        >
-          Auth Layout
-        </span>
-        <Link href="/auth/login" legacyBehavior>
-          <a
-            href="#pablo"
-            className={
-              "text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-blueGray-700"
-            }
-          >
-            Login
-          </a>
-        </Link>
-        <Link href="/auth/register" legacyBehavior>
-          <a
-            href="#pablo"
-            className={
-              "text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-blueGray-700"
-            }
-          >
-            Register
-          </a>
-        </Link>
+        </Link> */}
+
+        
         <div className="h-0 mx-4 my-2 border border-solid border-blueGray-100" />
         <span
           className={
@@ -129,7 +103,7 @@ const IndexDropdown = () => {
         >
           No Layout
         </span>
-        <Link href="/landing" legacyBehavior>
+        {/* <Link href="/landing" legacyBehavior>
           <a
             href="#pablo"
             className={
@@ -138,7 +112,7 @@ const IndexDropdown = () => {
           >
             Landing
           </a>
-        </Link>
+        </Link> */}
         <Link href="/profile" legacyBehavior>
           <a
             href="#pablo"

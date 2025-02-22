@@ -15,7 +15,7 @@ def analyze_complaint(description):
     key_phrases = response[0].key_phrases if response and response[0].key_phrases else []
     summary = " | ".join(key_phrases[:3]) 
 
-    existing_domains = Domain.objects.values_list('name', flat=True)
+    existing_domains = Domain.objects.values_list('domain_name', flat=True)
     classified_domain = None
 
     for domain in existing_domains:

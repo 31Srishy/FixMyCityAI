@@ -22,27 +22,37 @@ export default function CardComplaint() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formDataToSend = new FormData();
-    
+
     for (const key in formData) {
-      formDataToSend.append(key, formData[key]);
+        if (formData[key] !== null) {
+            formDataToSend.append(key, formData[key]);
+        }
     }
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/Complaints/submit-complaint/", {
-        method: "POST",
-        body: formDataToSend,
-      });
+        const response = await fetch("http://127.0.0.1:8000/Complaints/submit-complaint/", {
+            method: "POST",
+            body: formDataToSend, // Don't set Content-Type manually
+        });
 
-      if (response.ok) {
-        alert("Complaint submitted successfully!");
-        setFormData({ full_name: "", email: "", phone_no: "", location: "", description: "", image: null });
-      } else {
-        alert("Failed to submit complaint");
-      }
+        if (response.ok) {
+            alert("Complaint submitted successfully!");
+            setFormData({
+                full_name: "",
+                email: "",
+                phone_no: "",
+                location: "",
+                description: "",
+                image: null,
+            });
+        } else {
+            const errorData = await response.json();
+            alert("Failed to submit complaint: " + JSON.stringify(errorData));
+        }
     } catch (error) {
-      console.error("Error submitting complaint:", error);
+        console.error("Error submitting complaint:", error);
     }
-  };
+};
 
   return (
     <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-blueGray-100 border-0">

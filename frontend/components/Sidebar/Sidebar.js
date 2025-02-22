@@ -160,27 +160,50 @@ export default function Sidebar() {
                   </a>
                 </Link>
               </li>
-
               <li className="items-center">
-                <Link href="/admin/maps" legacyBehavior>
+                <Link href="/complaint" legacyBehavior>
                   <a
                     href="#pablo"
                     className={
                       "text-xs uppercase py-3 font-bold block " +
-                      (router.pathname.indexOf("/admin/maps") !== -1
+                      (router.pathname.indexOf("/complaint") !== -1
                         ? "text-lightBlue-500 hover:text-lightBlue-600"
                         : "text-blueGray-700 hover:text-blueGray-500")
                     }
                   >
                     <i
                       className={
-                        "fas fa-map-marked mr-2 text-sm " +
-                        (router.pathname.indexOf("/admin/maps") !== -1
+                        "fas fa-table mr-2 text-sm " +
+                        (router.pathname.indexOf("/complaint") !== -1
                           ? "opacity-75"
                           : "text-blueGray-300")
                       }
                     ></i>{" "}
-                    Maps
+                    Add Complaint
+                  </a>
+                </Link>
+              </li>
+
+              <li className="items-center">
+                <Link href="/domain" legacyBehavior>
+                  <a
+                    href="#pablo"
+                    className={
+                      "text-xs uppercase py-3 font-bold block " +
+                      (router.pathname.indexOf("/domain") !== -1
+                        ? "text-lightBlue-500 hover:text-lightBlue-600"
+                        : "text-blueGray-700 hover:text-blueGray-500")
+                    }
+                  >
+                    <i
+                      className={
+                        "fas fa-table mr-2 text-sm " +
+                        (router.pathname.indexOf("/domain") !== -1
+                          ? "opacity-75"
+                          : "text-blueGray-300")
+                      }
+                    ></i>{" "}
+                    Add Domain
                   </a>
                 </Link>
               </li>
@@ -188,93 +211,7 @@ export default function Sidebar() {
 
             {/* Divider */}
             <hr className="my-4 md:min-w-full" />
-            {/* Heading */}
-            <h6 className="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline">
-              Auth Layout Pages
-            </h6>
-            {/* Navigation */}
-
-            <ul className="md:flex-col md:min-w-full flex flex-col list-none md:mb-4">
-              <li className="items-center">
-                <Link href="/auth/login" legacyBehavior>
-                  <a
-                    href="#pablo"
-                    className="text-blueGray-700 hover:text-blueGray-500 text-xs uppercase py-3 font-bold block"
-                  >
-                    <i className="fas fa-fingerprint text-blueGray-400 mr-2 text-sm"></i>{" "}
-                    Login
-                  </a>
-                </Link>
-              </li>
-
-              <li className="items-center">
-                <Link href="/auth/register" legacyBehavior>
-                  <a
-                    href="#pablo"
-                    className="text-blueGray-700 hover:text-blueGray-500 text-xs uppercase py-3 font-bold block"
-                  >
-                    <i className="fas fa-clipboard-list text-blueGray-300 mr-2 text-sm"></i>{" "}
-                    Register
-                  </a>
-                </Link>
-              </li>
-            </ul>
-
-            {/* Divider */}
-            <hr className="my-4 md:min-w-full" />
-            {/* Heading */}
-            <h6 className="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline">
-              No Layout Pages
-            </h6>
-            {/* Navigation */}
-
-            <ul className="md:flex-col md:min-w-full flex flex-col list-none md:mb-4">
-              <li className="items-center">
-                <Link href="/landing" legacyBehavior>
-                  <a
-                    href="#pablo"
-                    className="text-blueGray-700 hover:text-blueGray-500 text-xs uppercase py-3 font-bold block"
-                  >
-                    <i className="fas fa-newspaper text-blueGray-400 mr-2 text-sm"></i>{" "}
-                    Landing Page
-                  </a>
-                </Link>
-              </li>
-
-              <li className="items-center">
-                <Link href="/profile" legacyBehavior>
-                  <a
-                    href="#pablo"
-                    className="text-blueGray-700 hover:text-blueGray-500 text-xs uppercase py-3 font-bold block"
-                  >
-                    <i className="fas fa-user-circle text-blueGray-400 mr-2 text-sm"></i>{" "}
-                    Profile Page
-                  </a>
-                </Link>
-              </li>
-            </ul>
-
-            {/* Divider */}
-            <hr className="my-4 md:min-w-full" />
-            {/* Heading */}
-            <h6 className="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline">
-              Documentation
-            </h6>
-            {/* Navigation */}
-            <ul className="md:flex-col md:min-w-full flex flex-col list-none md:mb-4">
-              <li className="inline-flex">
-                <a
-                  href="https://www.creative-tim.com/learning-lab/tailwind/nextjs/colors/notus"
-                  target="_blank"
-                  className="text-blueGray-700 hover:text-blueGray-500 text-sm block mb-4 no-underline font-semibold"
-                >
-                  <i className="fas fa-paint-brush mr-2 text-blueGray-300 text-base"></i>
-                  Styles
-                </a>
-              </li>
-
-              
-            </ul>
+            
           </div>
         </div>
       </nav>

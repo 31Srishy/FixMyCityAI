@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -146,5 +150,30 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # React frontend
 ]
+# AZURE_STORAGE_ACCOUNT_NAME="fixmycity"
 
+# STATIC_URL = 'static/'
+# STATICFILES_DIRS=[
+#     os.path.join(BASE_DIR,'static')
+#     ]
+# STATIC_ROOT=os.path.join(BASE_DIR,'assets')
+# MEDIA_URL='/media/'
+# MEDIA_ROOT=os.path.join(BASE_DIR,'media')
 
+CLOUDINARY_STORAGE = {
+    "CLOUD_NAME": "dy2e8quzw",
+    "API_KEY": "768127522875994",
+    "API_SECRET": "juAF4n2CLciVR1hezLzMRAnPls0",
+}
+
+# Use Cloudinary as the default storage for media files
+DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+
+# Media URL (Optional)
+MEDIA_URL = "https://res.cloudinary.com/dy2e8quzw/"
+
+cloudinary.config(
+    cloud_name=CLOUDINARY_STORAGE['CLOUD_NAME'],
+    api_key=CLOUDINARY_STORAGE['API_KEY'],
+    api_secret=CLOUDINARY_STORAGE['API_SECRET']
+)

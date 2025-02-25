@@ -9,6 +9,9 @@ FixMyCity AI is an AI-powered platform that helps citizens report civic issues (
 
 [![Watch the Pitch Video](https://img.shields.io/badge/Watch%20Pitch%20Video-%F0%9F%93%B2-blue?style=for-the-badge)](https://drive.google.com/file/d/13bntu-xTjlf2_83fFGwZk4seJDOw97o8/view?usp=sharing)  
 
+## 📌 Presentation Slides
+[Fix My City AI](https://drive.google.com/file/d/1C-9YUS_OnP7pi_sQY1nzEujU2UyYUoMR/view?usp=sharing)
+
 
 ## 📜 How to Run Locally
 1️⃣ Clone the repo:

@@ -15,12 +15,6 @@ class Domain(models.Model):
     ministry = models.CharField(max_length=100, unique=True, default="Default")
     phoneno = models.CharField(max_length=10, validators=[phone_validator], default='0000000000')
     email = models.EmailField(unique=True, default="help@gmail.com")
-    STATUS_CHOICES = [
-        ('low', 'low'),
-        ('medium', 'medium'),
-        ('high', 'high'),
-    ]
-    severity = models.CharField(max_length=20, choices=STATUS_CHOICES, default='low')  
 
     def __str__(self):
         return self.domain_name
@@ -63,10 +57,16 @@ class Complaint(models.Model):
     ]
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')  
 
-    severity_score = models.IntegerField(default=0)  
+    STATUS_CHOICES = [
+        ('low', 'low'),
+        ('medium', 'medium'),
+        ('high', 'high'),
+    ]
+    severity = models.CharField(max_length=20, choices=STATUS_CHOICES, default='low')  
 
     def __str__(self):
         return f"Complaint by {self.user.username} - {self.status}"
+
 
 
 

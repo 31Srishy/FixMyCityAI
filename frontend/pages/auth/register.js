@@ -7,28 +7,60 @@ export default function Register() {
     username: "",
     email: "",
     password: "",
-    role: "", // Default role
+    confirmPassword: "", // New field for confirming password
+    role: "citizen", // Default role
+    profile_pic: null,
+    address: "",
+    pincode: "",
+    phoneno: "",
   });
 
   const [error, setError] = useState(null);
+  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // State to toggle confirm password visibility
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value, files } = e.target;
+    if (name === "profile_pic") {
+      setFormData({ ...formData, [name]: files[0] });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleRegister = async () => {
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
     try {
+      const formDataToSend = new FormData();
+      for (const key in formData) {
+        if (key !== "confirmPassword") { // Exclude confirmPassword from the data sent to the backend
+          formDataToSend.append(key, formData[key]);
+        }
+      }
+
       const response = await fetch("http://127.0.0.1:8000/registration/register/", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
+        body: formDataToSend,
       });
 
       if (response.ok) {
         alert("Registration successful!");
-        setFormData({ username: "", email: "", password: "", role: "" }); // Reset form
+        setFormData({
+          username: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+          role: "citizen",
+          profile_pic: null,
+          address: "",
+          pincode: "",
+          phoneno: "",
+        }); // Reset form
+        setError(null);
       } else {
         const data = await response.json();
         setError(data.message || "Registration failed");
@@ -56,7 +88,7 @@ export default function Register() {
                 <form>
                   <div className="relative w-full mb-3">
                     <label className="block uppercase text-blueGray-600 text-xs font-bold mb-2">
-                    Username
+                      Username
                     </label>
                     <input
                       type="text"
@@ -86,17 +118,48 @@ export default function Register() {
                     <label className="block uppercase text-blueGray-600 text-xs font-bold mb-2">
                       Password
                     </label>
-                    <input
-                      type="password"
-                      name="password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full"
-                      placeholder="Password"
-                    />
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"} // Toggle password visibility
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full"
+                        placeholder="Password"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                      >
+                        {showPassword ? "Hide" : "Show"}
+                      </button>
+                    </div>
                   </div>
 
-                  {/* Role Dropdown */}
+                  <div className="relative w-full mb-3">
+                    <label className="block uppercase text-blueGray-600 text-xs font-bold mb-2">
+                      Confirm Password
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showConfirmPassword ? "text" : "password"} // Toggle confirm password visibility
+                        name="confirmPassword"
+                        value={formData.confirmPassword}
+                        onChange={handleChange}
+                        className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full"
+                        placeholder="Confirm Password"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                      >
+                        {showConfirmPassword ? "Hide" : "Show"}
+                      </button>
+                    </div>
+                  </div>
+
                   <div className="relative w-full mb-3">
                     <label className="block uppercase text-blueGray-600 text-xs font-bold mb-2">
                       Select Role
@@ -109,8 +172,63 @@ export default function Register() {
                     >
                       <option value="citizen">Citizen</option>
                       <option value="authority">Authority</option>
-                      
+                      {/* <option valu
+                      e="admin">Admin</option> */}
                     </select>
+                  </div>
+
+                  <div className="relative w-full mb-3">
+                    <label className="block uppercase text-blueGray-600 text-xs font-bold mb-2">
+                      Profile Picture
+                    </label>
+                    <input
+                      type="file"
+                      name="profile_pic"
+                      onChange={handleChange}
+                      className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full"
+                    />
+                  </div>
+
+                  <div className="relative w-full mb-3">
+                    <label className="block uppercase text-blueGray-600 text-xs font-bold mb-2">
+                      Address
+                    </label>
+                    <input
+                      type="text"
+                      name="address"
+                      value={formData.address}
+                      onChange={handleChange}
+                      className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full"
+                      placeholder="Address"
+                    />
+                  </div>
+
+                  <div className="relative w-full mb-3">
+                    <label className="block uppercase text-blueGray-600 text-xs font-bold mb-2">
+                      Pincode
+                    </label>
+                    <input
+                      type="text"
+                      name="pincode"
+                      value={formData.pincode}
+                      onChange={handleChange}
+                      className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full"
+                      placeholder="Pincode"
+                    />
+                  </div>
+
+                  <div className="relative w-full mb-3">
+                    <label className="block uppercase text-blueGray-600 text-xs font-bold mb-2">
+                      Phone Number
+                    </label>
+                    <input
+                      type="text"
+                      name="phoneno"
+                      value={formData.phoneno}
+                      onChange={handleChange}
+                      className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full"
+                      placeholder="Phone Number"
+                    />
                   </div>
 
                   <div className="text-center mt-6">

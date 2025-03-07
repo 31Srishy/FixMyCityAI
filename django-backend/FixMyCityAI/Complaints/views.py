@@ -14,6 +14,10 @@ import json
 from django.http import JsonResponse
 import uuid
 import os
+from django.db.models import Case, When, Value, IntegerField
+from datetime import datetime
+from django.shortcuts import get_object_or_404
+from django.views import View
 
 
 # Azure Storage Account credentials
@@ -149,3 +153,138 @@ def vote_complaint(request):
             return JsonResponse({"error": "Invalid JSON format"}, status=400)
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
+
+def get_all_complaints(request):
+    complaints = Complaint.objects.all().values(
+        'id', 'user__username', 'image', 'location', 'description', 'summary',
+        'classified_domain__name', 'vote', 'assigned__username',
+        'submitted_date', 'completed_date', 'status'
+    )
+    return JsonResponse(list(complaints), safe=False)
+
+
+class ComplaintsByDomainView(View):
+    def get(self, request):
+        domain_id = request.GET.get("domain_id")  # Get domain ID from query params
+
+        if not domain_id:
+            return JsonResponse({"error": "Domain ID is required"}, status=400)
+
+        # Retrieve domain object or return 404
+        domain = get_object_or_404(Domain, id=domain_id)
+        severity_ordering = Case(
+            When(status="High", then=Value(3)),
+            When(status="Medium", then=Value(2)),
+            When(status="Low", then=Value(1)),
+            default=Value(0),  # Default to 0 if status is missing
+            output_field=IntegerField(),
+        )
+        # Get complaints and serialize the Cloudinary image URL
+        # complaints = Complaint.objects.filter(classified_domain=domain).values(
+        #     "id", "user__username", "location", "description","summary", "status", "submitted_date"
+        # )
+        complaints = Complaint.objects.filter(classified_domain=domain).annotate(
+        severity_rank=severity_ordering
+        ).values(
+            "id", "user__username", "location", "description", "summary", "status", "submitted_date"
+        ).order_by("-severity", "-submitted_date")
+
+        # Convert queryset to list and add Cloudinary image URL manually
+        complaints_list = list(complaints)
+        for complaint in complaints_list:
+            obj = Complaint.objects.get(id=complaint["id"])  # Retrieve full object
+            complaint["image"] = obj.image.url if obj.image else None  # Get Cloudinary URL
+        # print(complaints_list)    
+        return JsonResponse(complaints_list, safe=False)
+
+class ComplaintsByDomainAndAuthorityView(View):
+    def get(self, request):
+        domain_id = request.GET.get("domain_id")  # Get domain ID from query params
+        authority_id = request.GET.get("authority_id") 
+        if not domain_id:
+            return JsonResponse({"error": "Domain ID is required"}, status=400)
+
+        # Retrieve domain object or return 404
+        domain = get_object_or_404(Domain, id=domain_id)
+        authority = get_object_or_404(User, id=authority_id,role="authority")
+        severity_ordering = Case(
+            When(status="High", then=Value(3)),
+            When(status="Medium", then=Value(2)),
+            When(status="Low", then=Value(1)),
+            default=Value(0),  # Default to 0 if status is missing
+            output_field=IntegerField(),
+        )
+        # Get complaints and serialize the Cloudinary image URL
+        # complaints = Complaint.objects.filter(classified_domain=domain).values(
+        #     "id", "user__username", "location", "description","summary", "status", "submitted_date"
+        # )
+        complaints = Complaint.objects.filter(classified_domain=domain,assigned=authority).annotate(
+        severity_rank=severity_ordering
+        ).values(
+            "id", "user__username", "location", "description", "summary", "status", "submitted_date"
+        ).order_by("-severity", "-submitted_date")
+
+        # Convert queryset to list and add Cloudinary image URL manually
+        complaints_list = list(complaints)
+        for complaint in complaints_list:
+            obj = Complaint.objects.get(id=complaint["id"])  # Retrieve full object
+            complaint["image"] = obj.image.url if obj.image else None  # Get Cloudinary URL
+        # print(complaints_list)    
+        return JsonResponse(complaints_list, safe=False)
+
+class AssignAuthorityView(APIView):
+    def post(self, request):
+        print("Received Data:", request.data)
+        complaint_id = request.data.get("complaint_id")
+        authority_id = request.data.get("authority_id")
+
+        if not complaint_id or not authority_id:
+            return Response({"error": "Complaint ID and Authority ID are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Fetch complaint
+        complaint = get_object_or_404(Complaint, id=complaint_id)
+
+        # Fetch authority user
+        authority = get_object_or_404(User, id=authority_id, role="authority")
+        print(authority)
+        # Assign authority and update status
+        complaint.assigned = authority
+        complaint.status = "In Progress"
+        complaint.save()
+
+        return Response({
+            "message": "Authority assigned successfully",
+            "assigned_to": authority.username,
+            "new_status": complaint.status
+        }, status=status.HTTP_200_OK)
+
+
+
+@api_view(["POST"])
+def update_complaint(request):
+    try:
+        data = request.data
+        complaint_id = data.get("complaint_id")
+        new_status = data.get("status")
+
+        # Fetch the complaint
+        complaint = Complaint.objects.get(id=complaint_id)
+
+        # Update status and set completed_date if resolved
+        complaint.status = new_status
+        if new_status == "Resolved":
+            complaint.completed_date = datetime.now()
+        else:
+            complaint.completed_date = None  # Reset completed_date if not resolved
+
+        complaint.save()
+
+        return JsonResponse({
+            "success": True,
+            "new_status": complaint.status,
+            "completed_date": complaint.completed_date,
+        })
+    except Complaint.DoesNotExist:
+        return JsonResponse({"error": "Complaint not found"}, status=404)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)

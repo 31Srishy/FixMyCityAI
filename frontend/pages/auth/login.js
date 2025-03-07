@@ -22,12 +22,16 @@ export default function Login() {
       });
 
       const data = await response.json();
-
+      console.log(data)
       if (response.ok) {
+        console.log(data)
         localStorage.setItem("access", data.access); // Store the token
         localStorage.setItem("user_role", data.role);
-        router.push("/admin/settings"); // Redirect to /admin/settings after login
-      } else {
+        localStorage.setItem("user", JSON.stringify(data.user));
+        console.log("User logged in:", JSON.stringify(data.user));
+        router.push("/admin/settings"); // Redirect to homepage after login
+      }
+      else {
         setError(data.error);
       }
     } catch (error) {

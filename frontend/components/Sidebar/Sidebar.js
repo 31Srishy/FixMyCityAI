@@ -203,7 +203,7 @@ export default function Sidebar() {
                           : "text-blueGray-300")
                       }
                     ></i>{" "}
-                    Add Domain
+                    Scroll Complaints
                   </a>
                 </Link>
               </li>

@@ -29,18 +29,25 @@ class ComplaintView(APIView):
     def post(self, request):
         serializer = ComplaintSerializer(data=request.data)
         if serializer.is_valid():
+            latitude = request.data.get('latitude')
+            longitude = request.data.get('longitude')
+            
+            # Check if a complaint with the same latitude and longitude already exists
+            if Complaint.objects.filter(latitude=latitude, longitude=longitude).exists():
+                return Response({"error": "Complaint already exists at this location."}, status=status.HTTP_409_CONFLICT)
+            
             try:
                 complaint = serializer.save()
                 summary, classified_domain, sentiment = analyze_complaint(complaint.description)
 
                 complaint.summary = summary
                 complaint.classified_domain = classified_domain
+                complaint.severity = sentiment
                 complaint.save()
 
                 return Response({"message": "Complaint submitted successfully!", "summary": summary}, status=status.HTTP_201_CREATED)
             except ValueError as e:
                 return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        print("Errors:", serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaflet";
 import L from "leaflet";
+import { useRouter } from "next/router";
 import "leaflet/dist/leaflet.css";
 import axios from "axios"; // For making API requests
 
@@ -34,6 +35,7 @@ export default function CardComplaint() {
 
   const [position, setPosition] = useState([51.505, -0.09]); // Default map center
   const [markerPosition, setMarkerPosition] = useState(null);
+  const router = useRouter();
 
   // Fetch user's current location on component mount
   useEffect(() => {
@@ -123,6 +125,12 @@ export default function CardComplaint() {
           description: "",
         });
         setMarkerPosition(null);
+      } else if (response.status === 409) {
+        // Handle the case where the complaint already exists
+        const errorData = await response.json();
+        alert(errorData.error);
+        // Redirect to domains page or any other page as needed
+        router.push("domain") // Adjust the URL as needed
       } else {
         const errorData = await response.json();
         alert("Failed to submit complaint: " + JSON.stringify(errorData));
@@ -130,7 +138,7 @@ export default function CardComplaint() {
     } catch (error) {
       console.error("Error submitting complaint:", error);
     }
-  };
+};
 
   return (
     <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-blueGray-100 border-0">

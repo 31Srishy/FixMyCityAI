@@ -3,7 +3,7 @@ from azure.core.credentials import AzureKeyCredential
 from .models import Domain
 
 AZURE_ENDPOINT = "https://fixmycity.cognitiveservices.azure.com/"
-AZURE_KEY = "AvMfjSXeS2bjOga35zrwIzoR1c9fYaIr2MgqXmKP5CthPxCEGPiEJQQJ99BBACYeBjFXJ3w3AAAaACOGGvNK"
+AZURE_KEY = "1lXRDWoQztUxJQstFaJfu74cUlDLuhFi3nuyfpTC1KlhSMYfPs0SJQQJ99BCACYeBjFXJ3w3AAAEACOG1ojb"
 
 def authenticate_client():
     return TextAnalyticsClient(endpoint=AZURE_ENDPOINT, credential=AzureKeyCredential(AZURE_KEY))

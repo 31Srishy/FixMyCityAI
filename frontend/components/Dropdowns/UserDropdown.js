@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 const UserDropdown = () => {
   const router = useRouter();
   const [dropdownPopoverShow, setDropdownPopoverShow] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("access"));
+  // const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("access"));
   const btnDropdownRef = useRef(null);
   const popoverDropdownRef = useRef(null);
 

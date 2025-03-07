@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 class RegisterSerializer(serializers.ModelSerializer):
-    role = serializers.ChoiceField(choices=[('Citizen', 'Citizen'), ('Admin', 'Admin'), ('Authority', 'Authority')], default='User')
+    role = serializers.ChoiceField(choices=[('citizen', 'Citizen'), ('admin', 'Admin'), ('authority', 'Authority')], default='User')
 
     class Meta:
         model = User
@@ -18,3 +18,9 @@ class RegisterSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField(write_only=True)
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "username", "email", "first_name", "last_name", "role"]

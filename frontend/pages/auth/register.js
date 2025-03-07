@@ -107,8 +107,8 @@ export default function Register() {
                       onChange={handleChange}
                       className="border-0 px-3 py-3 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full"
                     >
-                      <option value="Citizen">Citizen</option>
-                      <option value="Authority">Authority</option>
+                      <option value="citizen">Citizen</option>
+                      <option value="authority">Authority</option>
                       
                     </select>
                   </div>

@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from django.contrib.auth import authenticate,login
 from rest_framework.permissions import IsAuthenticated
 from .serializers import *
-
+from Complaints.models import Authority
 from django.contrib.auth.hashers import check_password
 
 User = get_user_model()
@@ -39,7 +39,6 @@ class RegisterView(APIView):
 
 class LoginView(APIView):
     def post(self, request):
-        # print("Received data:", request.data)  # Debugging print
         serializer = LoginSerializer(data=request.data)
 
         if serializer.is_valid():
@@ -51,12 +50,25 @@ class LoginView(APIView):
 
                 if user.check_password(password):  # Manually verify password
                     login(request, user)  # Log the user in
+                    
+                    user_data = UserSerializer(user).data
 
+                    # If the user is an authority, fetch additional details
+                    if user.role == "authority":
+                        try:
+                            authority = Authority.objects.get(user=user)
+                            user_data["authority_id"] = authority.id
+                            user_data["domain_id"] = authority.domain.id  # Assuming Authority has a ForeignKey to Domain
+                        except Authority.DoesNotExist:
+                            user_data["authority_id"] = None
+                            user_data["domain_id"] = None
+                    print(user_data)
                     refresh = RefreshToken.for_user(user)
+
                     return Response({
                         "refresh": str(refresh),
                         "access": str(refresh.access_token),
-                        "role": user.role
+                        "user": user_data  # Send updated user data
                     })
 
                 return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
@@ -64,7 +76,6 @@ class LoginView(APIView):
             except User.DoesNotExist:
                 return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
-        print("Serializer errors:", serializer.errors)  # Debugging print
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LogoutView(APIView):

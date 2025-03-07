@@ -126,11 +126,12 @@ def vote_complaint(request):
 
             # Toggle votes logic
             if "action" in data and data["action"] == "toggle":
-                
-                complaint.vote -= 1
-            
+                if complaint.vote > 0:
+                    complaint.vote -= 1  # Decrease vote if already liked
+                else:
+                    complaint.vote += 1  # Increase vote if not liked
             else:
-                complaint.votes += 1  # Default behavior
+                complaint.vote += 1  # Default behavior (increasing the vote)
 
             complaint.save()
             return JsonResponse({"message": "Vote updated", "votes": complaint.vote}, status=200)

@@ -1,14 +1,79 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import axios from "axios"; // For making API requests
+
+// Fix for default marker icons in Leaflet
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
+  iconUrl: require("leaflet/dist/images/marker-icon.png"),
+  shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
+});
+
+// Component to handle map click events
+const MapClickHandler = ({ handleMapClick }) => {
+  useMapEvents({
+    click: (e) => {
+      handleMapClick(e);
+    },
+  });
+  return null;
+};
 
 export default function CardComplaint() {
   const [formData, setFormData] = useState({
-    full_name: "",
-    email: "",
-    phone_no: "",
+    image: null,
+    pincode: "",
+    latitude: "",
+    longitude: "",
     location: "",
     description: "",
-    image: null,
   });
+
+  const [position, setPosition] = useState([51.505, -0.09]); // Default map center
+  const [markerPosition, setMarkerPosition] = useState(null);
+
+  // Fetch user's current location on component mount
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setPosition([latitude, longitude]);
+          setMarkerPosition([latitude, longitude]);
+          setFormData((prev) => ({
+            ...prev,
+            latitude: latitude.toString(),
+            longitude: longitude.toString(),
+          }));
+          fetchAddress(latitude, longitude); // Fetch address for current location
+        },
+        (error) => {
+          console.error("Error fetching location:", error);
+        }
+      );
+    } else {
+      console.error("Geolocation is not supported by this browser.");
+    }
+  }, []);
+
+  // Function to fetch address using reverse geocoding
+  const fetchAddress = async (lat, lng) => {
+    try {
+      const response = await axios.get(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+      );
+      const address = response.data.display_name;
+      setFormData((prev) => ({
+        ...prev,
+        location: address,
+      }));
+    } catch (error) {
+      console.error("Error fetching address:", error);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -19,40 +84,53 @@ export default function CardComplaint() {
     setFormData({ ...formData, image: e.target.files[0] });
   };
 
+  const handleMapClick = async (e) => {
+    const { lat, lng } = e.latlng;
+    console.log("Map clicked at:", lat, lng); // Debugging
+    setMarkerPosition([lat, lng]);
+    setFormData((prev) => ({
+      ...prev,
+      latitude: lat.toString(),
+      longitude: lng.toString(),
+    }));
+    await fetchAddress(lat, lng); // Fetch address for the clicked location
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formDataToSend = new FormData();
 
     for (const key in formData) {
-        if (formData[key] !== null) {
-            formDataToSend.append(key, formData[key]);
-        }
+      if (formData[key] !== null) {
+        formDataToSend.append(key, formData[key]);
+      }
     }
 
     try {
-        const response = await fetch("http://127.0.0.1:8000/Complaints/submit-complaint/", {
-            method: "POST",
-            body: formDataToSend, // Don't set Content-Type manually
-        });
+      const response = await fetch("http://127.0.0.1:8000/Complaints/submit-complaint/", {
+        method: "POST",
+        body: formDataToSend,
+      });
 
-        if (response.ok) {
-            alert("Complaint submitted successfully!");
-            setFormData({
-                full_name: "",
-                email: "",
-                phone_no: "",
-                location: "",
-                description: "",
-                image: null,
-            });
-        } else {
-            const errorData = await response.json();
-            alert("Failed to submit complaint: " + JSON.stringify(errorData));
-        }
+      if (response.ok) {
+        alert("Complaint submitted successfully!");
+        setFormData({
+          image: null,
+          pincode: "",
+          latitude: "",
+          longitude: "",
+          location: "",
+          description: "",
+        });
+        setMarkerPosition(null);
+      } else {
+        const errorData = await response.json();
+        alert("Failed to submit complaint: " + JSON.stringify(errorData));
+      }
     } catch (error) {
-        console.error("Error submitting complaint:", error);
+      console.error("Error submitting complaint:", error);
     }
-};
+  };
 
   return (
     <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-blueGray-100 border-0">
@@ -66,16 +144,16 @@ export default function CardComplaint() {
           <h6 className="text-blueGray-400 text-sm mt-3 mb-6 font-bold uppercase">Complaint Details</h6>
           <div className="flex flex-wrap">
             <div className="w-full lg:w-6/12 px-4">
-              <label className="block uppercase text-blueGray-600 text-xs font-bold mb-2">Full Name</label>
-              <input type="text" name="full_name" value={formData.full_name} onChange={handleChange} placeholder="Enter your full name" className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow w-full" required />
+              <label className="block uppercase text-blueGray-600 text-xs font-bold mb-2">Pincode</label>
+              <input type="text" name="pincode" value={formData.pincode} onChange={handleChange} placeholder="Enter pincode" className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow w-full" required />
             </div>
             <div className="w-full lg:w-6/12 px-4">
-              <label className="block uppercase text-blueGray-600 text-xs font-bold mb-2">Email Address</label>
-              <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Enter your email" className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow w-full" required />
+              <label className="block uppercase text-blueGray-600 text-xs font-bold mb-2">Latitude</label>
+              <input type="text" name="latitude" value={formData.latitude} onChange={handleChange} placeholder="Latitude" className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow w-full" readOnly />
             </div>
             <div className="w-full lg:w-6/12 px-4">
-              <label className="block uppercase text-blueGray-600 text-xs font-bold mb-2">Phone Number</label>
-              <input type="tel" name="phone_no" value={formData.phone_no} onChange={handleChange} placeholder="Enter your phone number" className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow w-full" required />
+              <label className="block uppercase text-blueGray-600 text-xs font-bold mb-2">Longitude</label>
+              <input type="text" name="longitude" value={formData.longitude} onChange={handleChange} placeholder="Longitude" className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow w-full" readOnly />
             </div>
             <div className="w-full lg:w-6/12 px-4">
               <label className="block uppercase text-blueGray-600 text-xs font-bold mb-2">Upload Image</label>
@@ -88,6 +166,23 @@ export default function CardComplaint() {
             <div className="w-full px-4">
               <label className="block uppercase text-blueGray-600 text-xs font-bold mb-2">Description</label>
               <textarea name="description" value={formData.description} onChange={handleChange} placeholder="Describe your complaint..." className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow w-full" rows="4" required></textarea>
+            </div>
+            <div className="w-full px-4 mt-4">
+              <label className="block uppercase text-blueGray-600 text-xs font-bold mb-2">Select Location on Map</label>
+              <div style={{ height: "300px", width: "100%", zIndex: 1 }}>
+                <MapContainer center={position} zoom={13} style={{ height: "100%", width: "100%" }}>
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  />
+                  <MapClickHandler handleMapClick={handleMapClick} />
+                  {markerPosition && (
+                    <Marker position={markerPosition}>
+                      <Popup>Selected Location</Popup>
+                    </Marker>
+                  )}
+                </MapContainer>
+              </div>
             </div>
           </div>
           <div className="text-center mt-6">

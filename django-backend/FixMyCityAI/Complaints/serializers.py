@@ -5,7 +5,7 @@ class ComplaintSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(required=False)
     class Meta:
         model = Complaint
-        fields = ['full_name', 'email', 'phone_no', 'image', 'location', 'description']
+        fields = [ 'image', 'pincode', 'latitude', 'longitude','location', 'description']
 
 class DomainSerializer(serializers.ModelSerializer):
     class Meta:

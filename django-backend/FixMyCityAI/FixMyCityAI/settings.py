@@ -98,10 +98,11 @@ WSGI_APPLICATION = 'FixMyCityAI.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME':'FixMyCity',
-        'USER':'postgres',
-        'PASSWORD':'1234',
-        'HOST':'localhost'
+        'NAME': 'defaultdb',
+        'USER': 'avnadmin',
+        'PASSWORD': 'AVNS_HYhX2NpU_RUVZxbs7md',
+        'HOST': 'pg-232d85b3-fixmycityai.d.aivencloud.com',
+        'PORT': 22717
     }
 }
 

@@ -31,7 +31,7 @@ class ComplaintView(APIView):
         if serializer.is_valid():
             try:
                 complaint = serializer.save()
-                summary, classified_domain = analyze_complaint(complaint.description)
+                summary, classified_domain, sentiment = analyze_complaint(complaint.description)
 
                 complaint.summary = summary
                 complaint.classified_domain = classified_domain

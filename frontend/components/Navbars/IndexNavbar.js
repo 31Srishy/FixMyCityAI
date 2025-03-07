@@ -81,34 +81,21 @@ export default function Navbar() {
             }
           >
             <ul className="flex flex-col lg:flex-row list-none mr-auto">
-              <li className="flex items-center">
-                <Link href="/" legacyBehavior>
-                  <a className="hover:text-blueGray-500 text-blueGray-700 px-3 py-4 lg:py-2 flex items-center text-xs uppercase font-bold">
-                    Home
-                  </a>
-                </Link>
-              </li>
-              <li className="flex items-center">
-                <Link href="/dashboard" legacyBehavior>
-                  <a className="hover:text-blueGray-500 text-blueGray-700 px-3 py-4 lg:py-2 flex items-center text-xs uppercase font-bold">
-                    Dashboard
-                  </a>
-                </Link>
-              </li>
+              {/* Removed Home and Dashboard links */}
               <li className="flex items-center">
                 <IndexDropdown />
               </li>
             </ul>
             <ul className="flex flex-col lg:flex-row list-none lg:ml-auto">
-              {!isAuthenticated? (
+              {!isAuthenticated ? (
                 <li>
                   <Link href="/auth/register" legacyBehavior>
                     <a className="text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-blueGray-700">
-                      Register
+                      Register here
                     </a>
                   </Link>
                 </li>
-              ):(
+              ) : (
                 <li>
                   <Link href="/profile" legacyBehavior>
                     <a className="text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-blueGray-700">

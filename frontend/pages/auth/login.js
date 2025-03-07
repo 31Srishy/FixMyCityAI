@@ -26,9 +26,8 @@ export default function Login() {
       if (response.ok) {
         localStorage.setItem("access", data.access); // Store the token
         localStorage.setItem("user_role", data.role);
-        router.push("/index"); // Redirect to homepage after login
-      }
-      else {
+        router.push("/admin/settings"); // Redirect to /admin/settings after login
+      } else {
         setError(data.error);
       }
     } catch (error) {

@@ -392,7 +392,7 @@ export default function Sidebar() {
                           : "text-blueGray-300")
                       }
                     ></i>{" "}
-                    Scroll Complaints
+                    View Complaints
                   </a>
                 </Link>
               </li>

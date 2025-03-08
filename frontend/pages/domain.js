@@ -6,21 +6,26 @@ import Form from "layouts/Form.js";
 
 export default function Settings() {
   const [complaints, setComplaints] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Fetch complaints from the backend
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const pincode = user?.pincode || "";
+
     const fetchComplaints = async () => {
       try {
         const response = await axios.get("http://localhost:8000/display-complaints/");
-        // Initialize `liked` state for each complaint
-        const complaintsWithLikes = response.data.map((complaint) => ({
+
+        // Filter complaints based on the user's pincode
+        const filteredComplaints = response.data.filter((complaint) => complaint.pincode === pincode);
+
+        // Initialize `liked`, `showFullDescription`, and `showFullLocation` state for each filtered complaint
+        const complaintsWithLikes = filteredComplaints.map((complaint) => ({
           ...complaint,
           liked: false, // Default to false
           showFullDescription: false, // Default to false
-          showFullSummary: false, // Default to false
+          showFullLocation: false, // Default to false
         }));
+
         setComplaints(complaintsWithLikes);
       } catch (error) {
         console.error("Error fetching complaints:", error);
@@ -67,11 +72,11 @@ export default function Settings() {
     );
   };
 
-  const toggleSummary = (id) => {
+  const toggleLocation = (id) => {
     setComplaints((prevComplaints) =>
       prevComplaints.map((complaint) =>
         complaint.id === id
-          ? { ...complaint, showFullSummary: !complaint.showFullSummary }
+          ? { ...complaint, showFullLocation: !complaint.showFullLocation }
           : complaint
       )
     );
@@ -81,9 +86,7 @@ export default function Settings() {
     <div className="flex justify-center items-center min-h-screen p-6 relative">
       {/* Overlapping Content */}
       <div className="w-full max-w-7xl px-4 absolute top-0 left-1/2 transform -translate-x-1/2 z-20">
-        {/* Main Heading */}
-        <h1 className="text-3xl font-bold text-center text-white mb-8">All Complaints</h1>
-
+      <h1 className="text-3xl font-bold text-center text-white mb-8">All Complaints in your pincode</h1>
         <div className="space-y-6 overflow-y-auto max-h-screen">
           {complaints.map((complaint) => (
             <div
@@ -110,7 +113,7 @@ export default function Settings() {
               </div>
 
               {/* Description Section */}
-              <div className="w-2/3 p-4 flex flex-col justify-between bg-gray-100 rounded-lg ml-4">
+              <div className="w-2/3 p-4 flex flex-col justify-between">
                 <div>
                   <h2 className="text-xl font-semibold">
                     {complaint.classified_domain}
@@ -131,26 +134,20 @@ export default function Settings() {
 
                   {/* Additional Fields */}
                   <div className="mt-4 space-y-2">
-                    {complaint.summary ? (
-                      <p className="text-gray-600 mt-2">
-                        Location:
-                        {complaint.showFullSummary
-                          ? complaint.location
-                          : `${complaint.location.slice(0, 50)}...`}
-                        {complaint.location.length > 50 && (
-                          <button
-                            onClick={() => toggleSummary(complaint.id)}
-                            className="text-blue-500 hover:underline ml-2"
-                          >
-                            {complaint.showFullSummary ? "Read less" : "Read more"}
-                          </button>
-                        )}
-                      </p>
-                    ) : (
-                      <p className="text-sm text-gray-500">
-                        <span className="font-semibold">Location:</span> {complaint.location}
-                      </p>
-                    )}
+                    <p className="text-sm text-gray-500">
+                      <span className="font-semibold">Location:</span>{" "}
+                      {complaint.showFullLocation
+                        ? complaint.location
+                        : `${complaint.location.slice(0, 50)}...`}
+                      {complaint.location.length > 50 && (
+                        <button
+                          onClick={() => toggleLocation(complaint.id)}
+                          className="text-blue-500 hover:underline ml-2"
+                        >
+                          {complaint.showFullLocation ? "Read less" : "Read more"}
+                        </button>
+                      )}
+                    </p>
                     <p className="text-sm text-gray-500">
                       <span className="font-semibold">Summary:</span> {complaint.summary}
                     </p>
@@ -164,7 +161,7 @@ export default function Settings() {
                 </div>
 
                 {/* Like Button Section */}
-                <div className="mt-4 flex justify-end">
+                <div className="mt-4 flex items-center justify-between">
                   <button
                     onClick={() => handleLike(complaint.id)}
                     className={`flex items-center space-x-2 text-lg font-semibold ${

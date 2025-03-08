@@ -372,7 +372,7 @@ export default function Sidebar() {
                   </a>
                 </Link>
               </li>
-{/* 
+
               <li className="items-center">
                 <Link href="/domain" legacyBehavior>
                   <a
@@ -395,7 +395,7 @@ export default function Sidebar() {
                     Scroll Complaints
                   </a>
                 </Link>
-              </li> */}
+              </li>
             </ul>
 
             {/* Divider */}

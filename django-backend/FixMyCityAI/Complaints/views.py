@@ -5,8 +5,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Complaint
+from registration.models import User
 from .serializers import *
-from .azure_services import analyze_complaint
+from .azure_services import analyze_complaint, authenticate_client
 from azure.storage.blob import BlobServiceClient
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
@@ -42,11 +43,11 @@ class ComplaintView(APIView):
             
             try:
                 complaint = serializer.save()
-                summary, classified_domain, sentiment = analyze_complaint(complaint.description)
+                summary, classified_domain = analyze_complaint(complaint.description)
 
                 complaint.summary = summary
                 complaint.classified_domain = classified_domain
-                complaint.severity = sentiment
+                # complaint.severity = sentiment
                 complaint.save()
 
                 return Response({"message": "Complaint submitted successfully!", "summary": summary}, status=status.HTTP_201_CREATED)
@@ -122,6 +123,17 @@ def get_complaints(request):
     serializer = ComplaintDisplaySerializer(complaints, many=True)
     # print(serializer.data)
     return Response(serializer.data)
+
+
+def check_authentication():
+    client = authenticate_client()
+    try:
+        response = client.detect_language(documents=["Hello, world!"])
+        print("Authentication successful!")
+        return True
+    except Exception as e:
+        print(f"Authentication failed: {e}")
+        return False
 
 @api_view(['GET'])
 def get_domains(request):

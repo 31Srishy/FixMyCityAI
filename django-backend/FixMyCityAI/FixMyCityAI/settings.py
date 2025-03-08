@@ -100,9 +100,14 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'defaultdb',
         'USER': 'avnadmin',
-        'PASSWORD': 'AVNS_HYhX2NpU_RUVZxbs7md',
-        'HOST': 'pg-232d85b3-fixmycityai.d.aivencloud.com',
-        'PORT': 22717
+        'PASSWORD': 'AVNS_c3Ghy8BoUp2WAnlIl_W',
+        'HOST': 'pg-1a50fabd-fixmycity123.d.aivencloud.com',
+        'PORT': 15155,
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
+        'CONN_MAX_AGE': 600,  # Keep DB connections open for 10 minutes
+    
     }
 }
 

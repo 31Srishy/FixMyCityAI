@@ -8,15 +8,22 @@ export default function Settings() {
   const [complaints, setComplaints] = useState([]);
 
   useEffect(() => {
-    // Fetch complaints from the backend
-    const fetchComplaints = async () => {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const pincode = user?.pincode || "";
+    
+  const fetchComplaints = async () => {
       try {
         const response = await axios.get("http://localhost:8000/display-complaints/");
-        // Initialize `liked` state for each complaint
-        const complaintsWithLikes = response.data.map((complaint) => ({
+
+        // Filter complaints based on the user's pincode
+        const filteredComplaints = response.data.filter((complaint) => complaint.pincode === pincode);
+
+        // Initialize `liked` state for each filtered complaint
+        const complaintsWithLikes = filteredComplaints.map((complaint) => ({
           ...complaint,
           liked: false, // Default to false
         }));
+
         setComplaints(complaintsWithLikes);
       } catch (error) {
         console.error("Error fetching complaints:", error);

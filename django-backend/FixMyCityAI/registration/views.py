@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from django.contrib.auth import authenticate,login
 from rest_framework.permissions import IsAuthenticated
 from .serializers import *
-from Complaints.models import Authority
+from Complaints.models import Authority,Domain
 from django.contrib.auth.hashers import check_password
 
 User = get_user_model()
@@ -26,17 +26,71 @@ User = get_user_model()
 # else:
 #     print("Authentication failed!")
 
+# class RegisterView(APIView):
+#     def post(self, request):
+#         print("Received Data:", request.data)
+#         domain=request.data.get("domain")  # Debugging
+#         serializer = RegisterSerializer(data=request.data)
+#         if serializer.is_valid():
+#             user = serializer.save()
+#             return Response({"message": "User registered successfully"}, status=status.HTTP_201_CREATED)
+#         print("Errors:", serializer.errors)
+
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# class RegisterView(APIView):
+#     def post(self, request):
+#         print("Received Data:", request.data)
+#         serializer = RegisterSerializer(data=request.data)
+
+#         if serializer.is_valid():
+#             user = serializer.save()  # This will handle the domain and Authority creation
+#             return Response({"message": "User registered successfully"}, status=status.HTTP_201_CREATED)
+
+#         print("Errors:", serializer.errors)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.core.exceptions import ObjectDoesNotExist
+from Complaints.models import Domain, Authority
+
 class RegisterView(APIView):
     def post(self, request):
-        print("Received Data:", request.data)  # Debugging
-        serializer = RegisterSerializer(data=request.data)
+        print("Received Data:", request.data)
+        
+        # Create a mutable copy of request.data
+        mutable_data = request.data.copy()
+        
+        # Extract the domain
+        domain = mutable_data.get("domain")  # Debugging
+        
+        # Remove the domain from the mutable data
+        if 'domain' in mutable_data:
+            del mutable_data['domain']
+        
+        # Pass the modified data to the serializer
+        serializer = RegisterSerializer(data=mutable_data)
+        
         if serializer.is_valid():
             user = serializer.save()
+
+            try:
+                # Fetch the Domain object using the ID
+                domain_obj = Domain.objects.get(id=domain)
+            except Domain.DoesNotExist:
+                return Response({"message": "Domain does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Create an Authority object
+            authority = Authority(user=user, domain=domain_obj)
+            authority.save()
+            
             return Response({"message": "User registered successfully"}, status=status.HTTP_201_CREATED)
+        
         print("Errors:", serializer.errors)
-
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    
 class LoginView(APIView):
     def post(self, request):
         serializer = LoginSerializer(data=request.data)

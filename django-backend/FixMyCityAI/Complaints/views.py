@@ -123,6 +123,12 @@ def get_complaints(request):
     # print(serializer.data)
     return Response(serializer.data)
 
+@api_view(['GET'])
+def get_domains(request):
+    domains = Domain.objects.all()
+    serializer = DomainSerializer(domains, many=True)
+    return Response(serializer.data)
+
 @csrf_exempt
 def vote_complaint(request):
     if request.method == "POST":

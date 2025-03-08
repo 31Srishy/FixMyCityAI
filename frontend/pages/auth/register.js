@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Auth from "layouts/Auth.js";
 import IndexNavbar from "components/Navbars/IndexNavbar.js";
 
@@ -9,6 +9,7 @@ export default function Register() {
     password: "",
     confirmPassword: "", // New field for confirming password
     role: "citizen", // Default role
+    domain: null,
     profile_pic: null,
     address: "",
     pincode: "",
@@ -18,6 +19,29 @@ export default function Register() {
   const [error, setError] = useState(null);
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
   const [showConfirmPassword, setShowConfirmPassword] = useState(false); // State to toggle confirm password visibility
+  const [domains, setDomains] = useState([]);
+
+  useEffect(() => {
+    if (formData.role === "authority") {
+      fetchDomains();
+    } else {
+      setFormData({ ...formData, domain: null }); // Reset domain if role is not authority
+    }
+  }, [formData.role]);
+
+  const fetchDomains = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/get_domains/");
+      if (response.ok) {
+        const data = await response.json();
+        setDomains(data);
+      } else {
+        setError("Failed to fetch domains");
+      }
+    } catch (error) {
+      setError("Error fetching domains");
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -55,6 +79,7 @@ export default function Register() {
           password: "",
           confirmPassword: "",
           role: "citizen",
+          domain: null,
           profile_pic: null,
           address: "",
           pincode: "",
@@ -176,6 +201,26 @@ export default function Register() {
                       e="admin">Admin</option> */}
                     </select>
                   </div>
+                  {formData.role === "authority" && (
+                      <div className="relative w-full mb-3">
+                        <label className="block uppercase text-blueGray-600 text-xs font-bold mb-2">
+                          Select Domain
+                        </label>
+                        <select
+                          name="domain"
+                          value={formData.domain || ""}
+                          onChange={handleChange}
+                          className="border-0 px-3 py-3 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full"
+                        >
+                          <option value="">Select a domain</option>
+                          {domains.map((domain) => (
+                            <option key={domain.id} value={domain.id}>
+                              {domain.domain_name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
 
                   <div className="relative w-full mb-3">
                     <label className="block uppercase text-blueGray-600 text-xs font-bold mb-2">
